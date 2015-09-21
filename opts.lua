@@ -9,7 +9,7 @@
 local M = { }
 
 function M.parse(arg)
-   local defaultDir = paths.concat(os.getenv('HOME'), 'fbcunn_imagenet')
+   local defaultDir = paths.concat(os.getenv('HOME'), 'deepDress/imagenet-multiGPU.torch')
 
     local cmd = torch.CmdLine()
     cmd:text()
@@ -22,7 +22,7 @@ function M.parse(arg)
                defaultDir ..'/imagenet_runs_oss',
                'subdirectory in which to save/log experiments')
     cmd:option('-data',
-               defaultDir .. '/imagenet_raw_images/256',
+               defaultDir .. '/split',
                'Home of ImageNet dataset')
     cmd:option('-manualSeed',         2, 'Manually set RNG seed')
     cmd:option('-GPU',                1, 'Default preferred GPU')
