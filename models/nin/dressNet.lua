@@ -1,11 +1,11 @@
 function createModel(nGPU)
-    assert(nGPU == 1 or nGPU == 2, '1-GPU or 2-GPU supported for AlexNet')
+    assert(nGPU == 1 or nGPU == 2, '1-GPU or 2-GPU supported for this net')
     local features
     if nGPU == 1 then
-       features = nn.Concat(2)
+       features = nn.Concat(1)
     else
        require 'fbcunn'
-       features = nn.ModelParallel(2)
+       features = nn.ModelParallel(1)
     end
 
     -- load model from zoo
@@ -42,11 +42,11 @@ function createModel(nGPU)
 --    classifier:add(nn.SpatialConvolutionMM(1024, nClasses, 1, 1, 1, 1, 0, 0))
 --    classifier:add(nn.ReLU(true))
 --    classifier:add(nn.SpatialAveragePooling(6, 6, 1, 1))
-
+--
     -- Combine both to create final model
     local model = nn.Sequential():add(features):add(classifier)
 
-    model.modules[1]:zeroGradParameters() -- don't change these weights yet
+    -- model.modules[1]:zeroGradParameters() -- don't change these weights yet, ideally just change the LR to very small
 
     return model
 
