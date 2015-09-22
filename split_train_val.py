@@ -23,38 +23,41 @@ def move(className, f, tgt):
     "{}/{}".format(tgtClassDir, f))
 
 def split(source, target, splitProb):
-  train = open('train.txt', 'w')
-  val   = open('val.txt'  , 'w')
+  train   = open('train.txt', 'w')
+  val     = open('val.txt'  , 'w')
+  labels  = open('classid.txt', 'w')
   classes = 0
   for className in os.listdir(source): # Could do in parallel but bah
   #for className in ["YK3"]: #os.listdir(source): # Could do in parallel but bah
     for root, directories, files in os.walk("{}/{}".format(source, className)):
       numberOfFiles = len(files)
       if numberOfFiles >= 10: # threshold
+        labels.write('{} {}\n'.format(classes, className))
         shuffled = random.sample(files, numberOfFiles) # Shuffle
         numberOfTrain = 0
         numberOfVal = 0
         for idx in range(numberOfFiles):
           if (idx < (splitProb * numberOfFiles)):
-            move(className, shuffled[idx], "train") # Will work for edge case of 1 example as well
-            train.write('"{}/{}/{}", {}\n'.format(source, className, shuffled[idx], className))
+            # move(className, shuffled[idx], "train") # Will work for edge case of 1 example as well
+            train.write('{}/{}/{} {}\n'.format(source, className, shuffled[idx], classes))
             numberOfTrain += 1
           else:
-            move(className, shuffled[idx], "val")
-            val.write('"{}/{}/{}", {}\n'.format(source, className, shuffled[idx], className))
+            # move(className, shuffled[idx], "val")
+            val.write('{}/{}/{} {}\n'.format(source, className, shuffled[idx], classes))
             numberOfVal += 1
         if numberOfVal == 0: # Should never happen if threshold > 1
           print("WARNING: Imbalanced class, balancing manually")
-          move(className, shuffled[0], "val")
+          # move(className, shuffled[0], "val")
           val.write('"{}/{}/{}", {}\n'.format(source, className, shufled[0], className))
         classes = classes + 1
         assert(numberOfTrain > 0)
         assert(numberOfVal > 0)
   train.close()
   val.close()
+  labels.close()
   return classes
 
-source = 'data'
+source = '/home/ubuntu/raw'
 target = 'split'
 splitProb = .8
 classes = split(source, target, splitProb)

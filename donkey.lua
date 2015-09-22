@@ -19,6 +19,12 @@ local trainCache = paths.concat(opt.cache, 'trainCache.t7')
 local testCache = paths.concat(opt.cache, 'testCache.t7')
 local meanstdCache = paths.concat(opt.cache, 'meanstdCache.t7')
 
+-- Overwrite mean values
+if opt.netType == 'dressNet' then
+    print("Loading Mean and Standard deviation from pre-trained model")
+    meanstdCache = 'models/nin/ilsvrc_2012_mean.t7'
+end
+
 -- Check for existence of opt.data
 if not os.execute('cd ' .. opt.data) then
     error(("could not chdir to '%s'"):format(opt.data))
@@ -140,6 +146,7 @@ local testHook = function(self, path)
    return out
 end
 
+print('testCache is ' .. testCache)
 if paths.filep(testCache) then
    print('Loading test metadata from cache')
    testLoader = torch.load(testCache)
@@ -168,7 +175,7 @@ if paths.filep(meanstdCache) then
    local meanstd = torch.load(meanstdCache)
    mean = meanstd.mean
    std = meanstd.std
-   print('Loaded mean and std from cache.')
+   print('Loaded mean and std from cache.' .. meanstdCache)
 else
    local tm = torch.Timer()
    local nSamples = 10000
@@ -201,6 +208,7 @@ else
    local cache = {}
    cache.mean = mean
    cache.std = std
+   print("Saving mean and stdev")
    torch.save(meanstdCache, cache)
    print('Time to estimate:', tm:time().real)
 end

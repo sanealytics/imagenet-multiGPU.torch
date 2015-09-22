@@ -18,9 +18,13 @@ require 'optim'
 ]]--
 
 -- 1.1. Create Network
-local config = opt.netType .. '_' .. opt.backend
-paths.dofile('models/' .. config .. '.lua')
-print('=> Creating model from file: models/' .. config .. '.lua')
+if opt.netType ~= 'dressNet' then
+    local config = opt.netType .. '_' .. opt.backend
+    paths.dofile('models/' .. config .. '.lua')
+    print('=> Creating model from file: models/' .. config .. '.lua')
+else
+    paths.dofile('models/nin/dressNet.lua')
+end
 model = createModel(opt.nGPU) -- for the model creation code, check the models/ folder
 
 -- 2. Create Criterion
